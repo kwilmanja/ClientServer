@@ -1,10 +1,25 @@
-
+import java.io.*;
+import java.net.*;
 
 public class Client{
-  public static void main(String[] args){
-    int port = Integer.parse(args);
-    Socket socket = new Socket("127.0.0.1", port);
+  public static void main(String[] args) throws IOException {
 
-    InputStream input = socket.getInputStream();
+
+    String ip = args[0];
+    int port = Integer.parseInt(args[1]);
+
+    Socket s = new Socket(ip, port);
+    PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+    BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+    out.println(reader.readLine());
+    System.out.println(in.readLine());
+
+    in.close();
+    out.close();
+    s.close();
+    reader.close();
   }
 }
