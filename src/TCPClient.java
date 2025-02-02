@@ -1,9 +1,8 @@
 import java.io.*;
 import java.net.*;
 
-public class Client{
+public class TCPClient{
   public static void main(String[] args) throws IOException {
-
 
     String ip = args[0];
     int port = Integer.parseInt(args[1]);
@@ -14,7 +13,8 @@ public class Client{
 
     BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-    out.println(reader.readLine());
+
+    out.println("1-P-hello-world");
     System.out.println(in.readLine());
 
     in.close();
