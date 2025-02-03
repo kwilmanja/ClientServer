@@ -50,10 +50,26 @@ public class Logger {
             + "Argument 2: " + arg2);
   }
 
-  public static void logMalformedRequest(InetAddress address, int port, int length) {
+  public static void logServerMalformed(InetAddress address, int port, int length) {
     System.out.println(Instant.now() + " - "
-            + "REQUEST - "
+            + "ERROR - "
             + "Source: " + address + ":" + port + " - "
-            + "Error: Received malformed request of length " + length);
+            + "Message: Received malformed packet of length " + length);
   }
+
+  public static void logClientMalformed(int requestID) {
+    System.out.println(Instant.now() + " - "
+            + "ERROR - "
+            + "Request ID: " + requestID + " - "
+            + "Message: received unsolicited response acknowledging unknown PUT/GET/DELETE with an invalid KEY");
+  }
+
+  public static void logTimeout(int requestID, int timeout) {
+    System.out.println(Instant.now() + " - "
+            + "ERROR - "
+            + "Request ID: " + requestID + " - "
+            + "Message - request timed out, no response after " + timeout + " milliseconds");
+  }
+
+
 }

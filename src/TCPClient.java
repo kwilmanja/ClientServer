@@ -1,33 +1,43 @@
-import java.io.*;
-import java.net.*;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 
-public class TCPClient implements Client{
+public class TCPClient extends Client{
 
   public Socket socket;
-  public int requestCount;
 
   public TCPClient(InetAddress address, int port) throws IOException {
+    super(address, port);
     this.socket = new Socket(address, port);
-    this.requestCount = 0;
+    this.socket.setSoTimeout(this.TIMEOUT_MILLIS);
   }
 
-  public void execute(ArrayList<Message> messages) throws IOException {
-
-    PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
-    BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-
-    for(Message message : messages){
-      //Send message
-//      out.println(this.requestCount + message);
-    }
-
-    out.close();
-    in.close();
-  }
-
-  public void close() throws IOException {
+  @Override
+  protected void close() throws IOException {
     this.socket.close();
   }
+
+  public boolean communicate(byte[] requestData, byte[] responseData) throws IOException {
+    OutputStream outputStream = this.socket.getOutputStream();
+    InputStream inputStream = this.socket.getInputStream();
+    try{
+      outputStream.write(requestData);
+      outputStream.flush();
+      inputStream.read(responseData);
+      return true;
+    } catch(SocketTimeoutException e) {
+      return false;
+    }
+
+  }
+
+
 
 }
