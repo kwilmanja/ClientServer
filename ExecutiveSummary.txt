@@ -1,0 +1,38 @@
+Assignment Overview:
+The purpose of this assignment is to expose us to client-server architecture and demonstrate
+a very simple example of a store across a network. TCP offers a reliable way to transport
+data, allowing a machine to establish a connection with another machine and open a data stream between them.
+This abstraction is useful for ordering the incoming packets and confirming all the data that was sent
+has arrived correctly. This is done through the use of acknowledgements in response to requests. UDP
+is a protocol with less structure that sends individual packets with no guaranteed delivery.
+In both cases, the client should be able to handle request timeouts as networks can exhibit unpredictable behavior,
+such as dropping packets. Both the client and server must address malformed packets as bad requests can be common.
+It is a priority of each machine to protect itself against these failures to continue servicing
+the broader system. It is important for both clients and servers to log their behavior, as this
+grants notice to possible bugs and inconsistencies in the code. This assignment is an introduction to
+the measures that must be taken to communicate between nodes in a distributed system.
+
+Technical Impression:
+It took me a while to figure out the proper form of abstraction to use for both the client and server.
+Both TCP and UDP shared similar logic for the actual processing of the data, so I knew it would
+be important to keep the network communication aspect split from the content. For the server, it receives
+a request, processes the request, then sends a response. This allowed me to create a single function,
+processData(byte[] requestData, InetAddress address, int port), that would be used to apply the necessary changes
+to the store and craft a response. I created two functions, one for each protocol, to wrap the processData
+function and handle all the network communications. For the client, it was almost reversed: it processed data,
+sent a request, waited for a response, then continued processing the messages. This inversion from the
+server architecture inspired me to create an abstract class Client to handle looping through the messages
+and handling the data. Then, two classes that extended the Client class could handle the communication,
+either using a TCP Socket or UDP DatagramSocket. The child classes would also handle the timeouts with their
+own socket implementations. I decided to structure my data in binary to ensure a rigid structure,
+with bytes at the beginning specifying the requestID, request type, and size of the data within the packet
+to help deserialize. Overall, I struggled the most with reading bytes off the TCP stream. I was worried
+the stream abstraction would interfere with the byte arrays I was gathering, but in the end, I was able to
+build a solution that read in the request and continued processing.
+
+Network communication is an important concept for software development. An example of when something such as
+this could be used in the industry would be a web application that hosts an online marketplace.
+The backend would get requests from the frontend, like posting an item for sale or buying an already posted item,
+and would need to carry out the transaction and send confirmation back to the user that their request was fulfilled.
+The server needs to have a consistent state, while maintaining availability. If a process on the server failed,
+or if the server never got the request, it is essential for the client to know this.
