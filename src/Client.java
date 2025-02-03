@@ -24,51 +24,60 @@ public abstract class Client{
     byte[] responseData = new byte[1024];
 
     for(Message m : messages){
+      try {
+        this.requestCount++;
 
-      Logger.logRequest(this.requestCount, m.type, m.arg1, m.arg2);
 
-      requestData = m.convertToRequestData(this.requestCount);
+        Logger.logRequest(this.requestCount, m.type, m.arg1, m.arg2);
 
-      while(true){
+        requestData = m.convertToRequestData(this.requestCount);
 
-        if(communicate(requestData, responseData)){
-          try {
-            ByteBuffer byteBuffer = ByteBuffer.wrap(responseData);
+        sendData(requestData);
 
-            int requestID = byteBuffer.getInt();
-            if (requestID != this.requestCount) {
+        while (true) {
+
+          if (readData(responseData)) {
+            try {
+              ByteBuffer byteBuffer = ByteBuffer.wrap(responseData);
+
+              int requestID = byteBuffer.getInt();
+              if (requestID != this.requestCount) {
+                Logger.logClientMalformed(this.requestCount);
+                continue;
+              }
+
+              Type type = Type.fromCode(byteBuffer.getInt());
+              int status = byteBuffer.getInt();
+              int messageSize = byteBuffer.getInt();
+
+              byte[] messageData = new byte[messageSize];
+              byteBuffer.get(messageData);
+              String value = new String(messageData, StandardCharsets.UTF_8);
+
+              Logger.logResponse(requestID, type, status, value);
+              break;
+            } catch (Exception e) {
               Logger.logClientMalformed(this.requestCount);
-              continue;
             }
-
-            Type type = Type.fromCode(byteBuffer.getInt());
-            int status = byteBuffer.getInt();
-            int messageSize = byteBuffer.getInt();
-
-            byte[] messageData = new byte[messageSize];
-            byteBuffer.get(messageData);
-            String value = new String(messageData, StandardCharsets.UTF_8);
-
-            Logger.logResponse(requestID, type, status, value);
+          } else {
+            Logger.logTimeout(this.requestCount, this.TIMEOUT_MILLIS);
             break;
-          } catch (Exception e){
-            Logger.logClientMalformed(this.requestCount);
           }
-        } else{
-          Logger.logTimeout(this.requestCount, this.TIMEOUT_MILLIS);
-          break;
+
         }
 
+      } catch(Exception e){
+        System.err.println("Error handling message " + this.requestCount + " - " + e.getMessage());
       }
-
-      this.requestCount++;
     }
     close();
   }
 
   protected abstract void close() throws IOException;
 
-  protected abstract boolean communicate(byte[] requestData, byte[] responseData) throws IOException;
+  protected abstract void sendData(byte[] requestData) throws IOException;
+
+  protected abstract boolean readData(byte[] responseData) throws IOException;
 
 
   public static void main(String[] args) throws IOException {
@@ -86,9 +95,38 @@ public abstract class Client{
 
     ArrayList<Message> messages = new ArrayList<>();
 
+    //Fill the store:
     messages.add(new Message(Type.PUT, "hello", "world"));
+    messages.add(new Message(Type.PUT, "one", "two"));
+    messages.add(new Message(Type.PUT, "name", "Joe"));
+    messages.add(new Message(Type.PUT, "major", "computer science"));
+    messages.add(new Message(Type.PUT, "hobby", "skiing"));
+    messages.add(new Message(Type.PUT, "height", "6 feet"));
+    messages.add(new Message(Type.PUT, "weight", "879"));
+    messages.add(new Message(Type.PUT, "fill", "the store"));
+
+    //Carry out transactions:
     messages.add(new Message(Type.GET, "hello"));
+    messages.add(new Message(Type.GET, "not in the database"));
+    messages.add(new Message(Type.GET, "hobby"));
+    messages.add(new Message(Type.DELETE, "hobby"));
+    messages.add(new Message(Type.GET, "hobby"));
+    messages.add(new Message(Type.PUT, "hobby", "snowboarding"));
+    messages.add(new Message(Type.GET, "hobby"));
+    messages.add(new Message(Type.PUT, "hobby", "knitting"));
+    messages.add(new Message(Type.DELETE, "major"));
+    messages.add(new Message(Type.DELETE, "nothing here"));
+    messages.add(new Message(Type.GET, "hobby"));
     messages.add(new Message(Type.DELETE, "hello"));
+    messages.add(new Message(Type.DELETE, "one"));
+    messages.add(new Message(Type.GET, "hello"));
+    messages.add(new Message(Type.PUT, "hello", "world again"));
+    messages.add(new Message(Type.GET, "hello"));
+    messages.add(new Message(Type.DELETE, "name"));
+    messages.add(new Message(Type.DELETE, "name"));
+    messages.add(new Message(Type.GET, "name"));
+    messages.add(new Message(Type.PUT, "name", "I'm back"));
+    messages.add(new Message(Type.GET, "name"));
 
     client.execute(messages);
   }

@@ -48,17 +48,20 @@ public class Server{
     switch(type) {
       case PUT:
         this.store.put(arg1, arg2);
-        return createResponseData(requestID, type, 1, "SUCCESS", address, port);
+        return createResponseData(requestID, type, 1, "successfully put entry", address, port);
       case GET:
         Optional<String> value = this.store.get(arg1);
         if (value.isPresent()) {
           return createResponseData(requestID, type, 1, value.get(), address, port);
         } else {
-          return createResponseData(requestID, type, 0, "Key not found", address, port);
+          return createResponseData(requestID, type, 0, "key not found", address, port);
         }
       case DELETE:
-        this.store.delete(arg1);
-        return createResponseData(requestID, type, 1, "SUCCESS", address, port);
+        if(this.store.delete(arg1)){
+          return createResponseData(requestID, type, 1, "successfully deleted entry", address, port);
+        } else{
+          return createResponseData(requestID, type, 0, "key not found", address, port);
+        }
     }
     return null;
   }
@@ -101,6 +104,7 @@ public class Server{
         responsePacket = new DatagramPacket(responseData, responseData.length,
                 requestPacket.getAddress(), requestPacket.getPort());
         socket.send(responsePacket);
+
       } catch(Exception e){
         Logger.logServerMalformed(requestPacket.getAddress(), requestPacket.getPort(), requestPacket.getLength());
       }

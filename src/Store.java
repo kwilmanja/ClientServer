@@ -13,8 +13,12 @@ public class Store {
     store.put(key, value);
   }
 
-  public void delete(String key){
-    store.remove(key);
+  public boolean delete(String key){
+    if(store.containsKey(key)){
+      store.remove(key);
+      return true;
+    }
+    return false;
   }
 
   public Optional<String> get(String key){

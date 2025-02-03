@@ -22,13 +22,18 @@ public class UDPClient extends Client{
     this.socket.close();
   }
 
-  public boolean communicate(byte[] requestData, byte[] responseData) throws IOException {
+  @Override
+  protected void sendData(byte[] requestData) throws IOException {
     DatagramPacket requestPacket;
+    requestPacket = new DatagramPacket(requestData, requestData.length, this.address, this.port);
+    socket.send(requestPacket);
+
+  }
+
+  @Override
+  protected boolean readData(byte[] responseData) throws IOException {
     DatagramPacket responsePacket;
     try{
-      requestPacket = new DatagramPacket(requestData, requestData.length, this.address, this.port);
-      socket.send(requestPacket);
-
       responsePacket = new DatagramPacket(responseData, 1024);
       socket.receive(responsePacket);
       return true;
@@ -36,6 +41,23 @@ public class UDPClient extends Client{
       return false;
     }
   }
+//
+//  public boolean communicate(byte[] requestData, byte[] responseData) throws IOException {
+//    DatagramPacket requestPacket;
+//    DatagramPacket responsePacket;
+//    try{
+//      requestPacket = new DatagramPacket(requestData, requestData.length, this.address, this.port);
+//      socket.send(requestPacket);
+//
+//      responsePacket = new DatagramPacket(responseData, 1024);
+//      socket.receive(responsePacket);
+//      return true;
+//    } catch (SocketTimeoutException e) {
+//      return false;
+//    }
+//  }
+
+
 
 
 

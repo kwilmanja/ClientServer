@@ -24,19 +24,37 @@ public class TCPClient extends Client{
     this.socket.close();
   }
 
-  public boolean communicate(byte[] requestData, byte[] responseData) throws IOException {
+  @Override
+  protected void sendData(byte[] requestData) throws IOException {
     OutputStream outputStream = this.socket.getOutputStream();
+    outputStream.write(requestData);
+    outputStream.flush();
+  }
+
+  @Override
+  protected boolean readData(byte[] responseData) throws IOException {
     InputStream inputStream = this.socket.getInputStream();
+
     try{
-      outputStream.write(requestData);
-      outputStream.flush();
       inputStream.read(responseData);
       return true;
     } catch(SocketTimeoutException e) {
       return false;
     }
-
   }
+
+//  public boolean communicate(byte[] requestData, byte[] responseData) throws IOException {
+//    OutputStream outputStream = this.socket.getOutputStream();
+//    InputStream inputStream = this.socket.getInputStream();
+//    try{
+//      outputStream.write(requestData);
+//      outputStream.flush();
+//      inputStream.read(responseData);
+//      return true;
+//    } catch(SocketTimeoutException e) {
+//      return false;
+//    }
+//  }
 
 
 
