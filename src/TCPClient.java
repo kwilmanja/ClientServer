@@ -1,25 +1,33 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
-public class TCPClient{
-  public static void main(String[] args) throws IOException {
+public class TCPClient implements Client{
 
-    String ip = args[0];
-    int port = Integer.parseInt(args[1]);
+  public Socket socket;
+  public int requestCount;
 
-    Socket s = new Socket(ip, port);
-    PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-    BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-
-    out.println("1-P-hello-world");
-    System.out.println(in.readLine());
-
-    in.close();
-    out.close();
-    s.close();
-    reader.close();
+  public TCPClient(InetAddress address, int port) throws IOException {
+    this.socket = new Socket(address, port);
+    this.requestCount = 0;
   }
+
+  public void execute(ArrayList<Message> messages) throws IOException {
+
+    PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
+    BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+
+    for(Message message : messages){
+      //Send message
+//      out.println(this.requestCount + message);
+    }
+
+    out.close();
+    in.close();
+  }
+
+  public void close() throws IOException {
+    this.socket.close();
+  }
+
 }
