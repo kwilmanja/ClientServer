@@ -1,30 +1,29 @@
-# Project 1
+# Project 2
 
-There are two classes in the project:
+There are two services in the project:
 
-Client: The client connects to the specified server using either TCP or UDP. It then sends over requests to populate the store. 
-Then, it sends a combination of PUT, GET, and DELETE requests. For each request, it awaits a response. 
-If no response comes in 3 seconds, then it will log the timeout and continue on with the next request. 
-If it receives any malformed packets, it will log the error and continue waiting for the expected packet 
-to arrive (until another timeout occurs or the correct packet arrives).
+Client: The client connects to the specified server using Java's RMI library.
+It locates the registry and looks up the "Store" service, keeping reference to the stub object to handle requests.
+Then, it sends a combination of PUT, GET, and DELETE requests. For each request, it awaits a response.
+The client tests the threading of the server by instantiating many threads to bombard the server
+with requests.
 
 Server: The server operates a store and communicates with a client to carry out PUT, GET, and DELETE requests.
-The server can be instantiated with either TCP or UDP as its communication protocol.
-Upon receiving a request, the server ends back a response with the requestID, status (1 for OK, 0 for ERROR),
-type of request it is answering, and a value. If the server receives malformed packets,
-it will not issue a response and log the event.
+The server creates a registry and binds an CoordinatorStore instance to the registry under the service "Store".
+When a client makes an RMI call, the server handles it in a thread and carries out the request.
+The store uses a ConcurrentHashMap to handle concurrency issues, as well as synchronized blocks
+for methods that reference the map more than once (GET/DELETE).
 
 First, to compile the files:
 
 ```
-javac Server.java
-javac Client.java
+javac RMIServer.java
+javac RMIClient.java
 ```
 
 Then, to run the programs:
 
 ```
-java Server <port> <useTCP>
-java Client <ip> <port> <useTCP>
+java RMIServer <port>
+java RMIClient <ip> <port>
 ```
-with the variable useTCP set to 1 if the client/server should use TCP, and 0 if the client/server should use UDP

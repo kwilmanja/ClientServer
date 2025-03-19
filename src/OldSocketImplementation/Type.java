@@ -1,3 +1,5 @@
+package OldSocketImplementation;
+
 public enum Type{
   PUT(0),
   GET(1),
@@ -19,7 +21,7 @@ public enum Type{
         return t;
       }
     }
-    throw new IllegalArgumentException("Invalid Type Code: " + i);
+    throw new IllegalArgumentException("Invalid OldSocketImplementation.Type Code: " + i);
   }
 
 }

@@ -1,38 +1,7 @@
 Assignment Overview:
-The purpose of this assignment is to expose us to client-server architecture and demonstrate
-a very simple example of a store across a network. TCP offers a reliable way to transport
-data, allowing a machine to establish a connection with another machine and open a data stream between them.
-This abstraction is useful for ordering the incoming packets and confirming all the data that was sent
-has arrived correctly. This is done through the use of acknowledgements in response to requests. UDP
-is a protocol with less structure that sends individual packets with no guaranteed delivery.
-In both cases, the client should be able to handle request timeouts as networks can exhibit unpredictable behavior,
-such as dropping packets. Both the client and server must address malformed packets as bad requests can be common.
-It is a priority of each machine to protect itself against these failures to continue servicing
-the broader system. It is important for both clients and servers to log their behavior, as this
-grants notice to possible bugs and inconsistencies in the code. This assignment is an introduction to
-the measures that must be taken to communicate between nodes in a distributed system.
+
+The purpose of this assignment was to expose students to RMI and RPC protocols for communication across a network. Remote method invocation allows applications to call methods on objects in foreign JVM's through the utility of the stub/skeleton abstraction. It allows the developer to ignore the underlying serialization of objects and requests, instead delegating this task to a Java library. The assignment also meant to expose us to threaded programming. Threaded programming is a necessary element of distributed systems as it is essential for scalability. Running multiple processes at the same time allows servers to handle a multitude of client requests in a timely and efficient manner. The assignment stresses the importance of mutual exclusion locking and design that factors in synchronous access to important data structures. Without some sense of protection, it is easy for a threaded application to interfere with itself as multiple threads manipulate and access data at the same time, violating any sense of an atomicity and reliability of the data.
 
 Technical Impression:
-It took me a while to figure out the proper form of abstraction to use for both the client and server.
-Both TCP and UDP shared similar logic for the actual processing of the data, so I knew it would
-be important to keep the network communication aspect split from the content. For the server, it receives
-a request, processes the request, then sends a response. This allowed me to create a single function,
-processData(byte[] requestData, InetAddress address, int port), that would be used to apply the necessary changes
-to the store and craft a response. I created two functions, one for each protocol, to wrap the processData
-function and handle all the network communications. For the client, it was almost reversed: it processed data,
-sent a request, waited for a response, then continued processing the messages. This inversion from the
-server architecture inspired me to create an abstract class Client to handle looping through the messages
-and handling the data. Then, two classes that extended the Client class could handle the communication,
-either using a TCP Socket or UDP DatagramSocket. The child classes would also handle the timeouts with their
-own socket implementations. I decided to structure my data in binary to ensure a rigid structure,
-with bytes at the beginning specifying the requestID, request type, and size of the data within the packet
-to help deserialize. Overall, I struggled the most with reading bytes off the TCP stream. I was worried
-the stream abstraction would interfere with the byte arrays I was gathering, but in the end, I was able to
-build a solution that read in the request and continued processing.
 
-Network communication is an important concept for software development. An example of when something such as
-this could be used in the industry would be a web application that hosts an online marketplace.
-The backend would get requests from the frontend, like posting an item for sale or buying an already posted item,
-and would need to carry out the transaction and send confirmation back to the user that their request was fulfilled.
-The server needs to have a consistent state, while maintaining availability. If a process on the server failed,
-or if the server never got the request, it is essential for the client to know this.
+Using the RMI library was not as complicated nor challenging as I expected it to be when I began the assignment. It was easy to establish a connection by looking up the registry and creating a reference to the remote store. I came to a greater appreciation of the established protocol as it was much easier than the first project where serialization was a major concern. The level of abstraction allows developers to focus more on the service itself and have a general sense of trust in the reliability of the communication mechanism. I was happy to discover that the Java RMI library already is a threaded architecture. I played around with the server and client for quite a while, adding random sleep calls to the threads on both the server and client to ensure the server was handling the requests in different threads. I also log the name of the thread for each server request as well as the timestamp and the action performed. To protect the data, I used a ConcurrentHashMap, as this operates as a thread protected hashmap. Even with this protection, the DELETE and GET operations were left open to failure as both operations first check if the map contains the key, then either removes or retrieves the value. For this, I had to use a synchronized block to ensure that no other threads altered the data while the DELETE / GET operations were being performed. Overall, it was a rewarding experience and a good lesson in threaded programming and RMI.

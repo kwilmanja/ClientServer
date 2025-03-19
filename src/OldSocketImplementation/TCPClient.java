@@ -1,15 +1,15 @@
+package OldSocketImplementation;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
 
-public class TCPClient extends Client{
+import OldSocketImplementation.Client;
+
+public class TCPClient extends Client {
 
   public Socket socket;
 

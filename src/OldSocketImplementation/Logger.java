@@ -1,3 +1,5 @@
+package OldSocketImplementation;
+
 import java.net.InetAddress;
 import java.time.Instant;
 
@@ -15,7 +17,7 @@ public class Logger {
     System.out.println(Instant.now() + " - "
             + "RESPONSE - "
             + "Request ID: " + requestID + " - "
-            + "Type: " + type + " - "
+            + "OldSocketImplementation.Type: " + type + " - "
             + "Status: " + status + " - "
             + "Value: " + value);
   }
@@ -25,7 +27,7 @@ public class Logger {
             + "RESPONSE - "
             + "Destination: " + address + ":" + port + " - "
             + "Request ID: " + requestID + " - "
-            + "Type: " + type + " - "
+            + "OldSocketImplementation.Type: " + type + " - "
             + "Status: " + status + " - "
             + "Value: " + value);
   }
@@ -34,7 +36,7 @@ public class Logger {
     System.out.println(Instant.now() + " - "
             + "REQUEST - "
             + "Request ID: " + requestID + " - "
-            + "Type: " + type + " - "
+            + "OldSocketImplementation.Type: " + type + " - "
             + "Argument 1: " + arg1 + " - "
             + "Argument 2: " + arg2);
 
@@ -45,7 +47,7 @@ public class Logger {
             + "REQUEST - "
             + "Source: " + address + ":" + port + " - "
             + "Request ID: " + requestID + " - "
-            + "Type: " + type + " - "
+            + "OldSocketImplementation.Type: " + type + " - "
             + "Argument 1: " + arg1 + " - "
             + "Argument 2: " + arg2);
   }
@@ -54,21 +56,21 @@ public class Logger {
     System.out.println(Instant.now() + " - "
             + "ERROR - "
             + "Source: " + address + ":" + port + " - "
-            + "Message: Received malformed packet of length " + length);
+            + "OldSocketImplementation.Message: Received malformed packet of length " + length);
   }
 
   public static void logClientMalformed(int requestID) {
     System.out.println(Instant.now() + " - "
             + "ERROR - "
             + "Request ID: " + requestID + " - "
-            + "Message: received unsolicited response acknowledging unknown PUT/GET/DELETE with an invalid KEY");
+            + "OldSocketImplementation.Message: received unsolicited response acknowledging unknown PUT/GET/DELETE with an invalid KEY");
   }
 
   public static void logTimeout(int requestID, int timeout) {
     System.out.println(Instant.now() + " - "
             + "ERROR - "
             + "Request ID: " + requestID + " - "
-            + "Message - request timed out, no response after " + timeout + " milliseconds");
+            + "OldSocketImplementation.Message - request timed out, no response after " + timeout + " milliseconds");
   }
 
 
